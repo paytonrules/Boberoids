@@ -20,10 +20,12 @@ $(function() {
         gameOn = true,
         explosion,
         pop,
+        backgroundMusic,
         playerState = {rotatingLeft: false, rotatingRight: false, rotationAngle: 0};
 
     function start() {
       lastGeneration = (new Date()).getTime();
+      gameOn = true;
       getContext();
       bindKeys();
 
@@ -52,7 +54,7 @@ $(function() {
         spiderImage = spiderJQueryImage.get(0);
       });
 
-      var backgroundMusic = $("<audio src='sounds/boberoids/agelessspaceship.mp3' loop='loop'>");
+      backgroundMusic = $("<audio src='sounds/boberoids/agelessspaceship.mp3' loop='loop'>");
       backgroundMusic.bind("canplaythrough", function() {
         backgroundMusic.get(0).play();
       });
@@ -290,9 +292,16 @@ $(function() {
       context = canvas[0].getContext("2d");
     };
 
+    function stop() {
+      gameOn = false;
+      if (backgroundMusic) {
+        backgroundMusic.get(0).pause();
+      }
+    };
    
     return {
-      start: start
+      start: start,
+      stop: stop
     };
   })();
 
@@ -301,6 +310,10 @@ $(function() {
     if (slide.id === "boberoids_slide") {
       Boberoids.start();
     }
+    else {
+      Boberoids.stop();
+    }
+    
   });
 
 });
