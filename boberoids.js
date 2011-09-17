@@ -34,42 +34,42 @@ $(function() {
     };
 
     function load() {
-      var spaceImage = $("<img src='images/boberoids/space_background.png'>");
+      var spaceImage = $("<img src='images/space_background.png'>");
       spaceImage.load(function() {
         spaceBackground = spaceImage.get(0);
       });
 
-      var playerImage = $("<img src='images/boberoids/player.png'>");
+      var playerImage = $("<img src='images/player.png'>");
       playerImage.load(function() {
         player = playerImage.get(0);
       });
 
-      var bulletJQueryImage = $("<img src='images/boberoids/bullet.png'>");
+      var bulletJQueryImage = $("<img src='images/bullet.png'>");
       bulletJQueryImage.load(function() {
         bulletImage = bulletJQueryImage.get(0);
       });
 
-      var spiderJQueryImage = $("<img src='images/boberoids/bug_sprite.png'>");
+      var spiderJQueryImage = $("<img src='images/bug_sprite.png'>");
       spiderJQueryImage.load(function() {
         spiderImage = spiderJQueryImage.get(0);
       });
 
-      backgroundMusic = $("<audio src='sounds/boberoids/agelessspaceship.mp3' loop='loop'>");
+      backgroundMusic = $("<audio src='sounds/agelessspaceship.mp3' loop='loop'>");
       backgroundMusic.bind("canplaythrough", function() {
         backgroundMusic.get(0).play();
       });
 
-      var laserBeamJQuery = $("<audio src='sounds/boberoids/laser.mp3'>");
+      var laserBeamJQuery = $("<audio src='sounds/laser.mp3'>");
       laserBeamJQuery.bind("canplaythrough", function() {
         laserBeam = laserBeamJQuery.get(0);
       });
 
-      var explosionJQuery = $("<audio src='sounds/boberoids/explosion.mp3'>");
+      var explosionJQuery = $("<audio src='sounds/explosion.mp3'>");
       explosionJQuery.bind("canplaythrough", function() {
         explosion = explosionJQuery.get(0);
       });
 
-      var popJQuery = $("<audio src='sounds/boberoids/pop.mp3'>");
+      var popJQuery = $("<audio src='sounds/pop.mp3'>");
       popJQuery.bind("canplaythrough", function() {
         pop = popJQuery.get(0);
       });
@@ -305,15 +305,5 @@ $(function() {
     };
   })();
 
-	$(document).bind('deck.change', function(event, from, to) {
-    var slide = jQuery.deck('getSlide', to)[0];
-    if (slide.id === "boberoids_slide") {
-      Boberoids.start();
-    }
-    else {
-      Boberoids.stop();
-    }
-    
-  });
-
+  Boberoids.start();
 });
