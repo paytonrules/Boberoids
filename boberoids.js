@@ -14,6 +14,7 @@ $(function() {
         spiderImage,
         bullets = [],
         spiders = [],
+        score = 0,
         startTicks,
         lastGeneration,
         laserBeam,
@@ -161,6 +162,7 @@ $(function() {
           if (rectanglesIntersect(spiderRectangle, bulletRectangle)) {
             spiders = _(spiders).difference([spider]);
             bullets = _(bullets).difference([bullet]);
+            score += 10;
             pop.play();
             return;
           }
@@ -228,6 +230,10 @@ $(function() {
         context.drawImage(spiderImage, -48, -44);
         context.restore();
       });
+      context.fillStyle = "#FF0000";
+      context.font = "bold 60px sans-serif";
+      console.log("score" + score);
+      context.fillText(score.toString(), 8, 60);
 
       if (gameOn === false) {
         context.fillStyle = "#FF0000";
