@@ -22,7 +22,15 @@ $(function() {
         explosion,
         pop,
         backgroundMusic,
-        playerState = {rotatingLeft: false, rotatingRight: false, rotationAngle: 0};
+        playerState = {rotatingLeft: false,
+                       rotatingRight: false,
+                       rotationAngle: 0,
+                       movingLeft: false,
+                       movingUp: false,
+                       movingRight: false,
+                       movingDown: false,
+                       x: 415,
+                       y: 315};
 
     function start() {
       lastGeneration = (new Date()).getTime();
@@ -80,7 +88,7 @@ $(function() {
       var facingX = Math.cos(playerState.rotationAngle);
       var facingY = Math.sin(playerState.rotationAngle);
      
-      bullets.push({x: 400, y: 300, rotationAngle: playerState.rotationAngle, facingX: facingX, facingY: facingY});
+      bullets.push({x: playerState.x, y: playerState.y, rotationAngle: playerState.rotationAngle, facingX: facingX, facingY: facingY});
       laserBeam.play();
     };
 
@@ -107,6 +115,7 @@ $(function() {
         moveBullets();
         generateNewSpiders();
         moveSpiders();
+        movePlayer();
         checkCollisions();
       }
     };
@@ -149,6 +158,22 @@ $(function() {
       });
     };
 
+    function movePlayer() {
+      var speed = 4;
+      if (playerState.movingLeft) {
+        playerState.x -= speed;
+      };
+      if (playerState.movingRight) {
+        playerState.x += speed;
+      };
+      if (playerState.movingUp) {
+        playerState.y -= speed;
+      };
+      if (playerState.movingDown) {
+        playerState.y += speed;
+      };
+    }
+
     function checkCollisions() {
       checkCollisionsWithSpidersAndBullets();
       checkCollisionsWithSpidersAndPlayer();
@@ -173,7 +198,7 @@ $(function() {
     function checkCollisionsWithSpidersAndPlayer() {
       _(spiders).each(function(spider) {
         var spiderRectangle = {left: spider.x, top: spider.y, right: spider.x + 96, bottom: spider.y + 88};
-        var playerRectangle = {left: 415, top: 315, right: 450, bottom: 340};
+        var playerRectangle = {left: playerState.x, top: playerState.y, right: playerState.x + 35, bottom: playerState.y + 35};
 
         if (rectanglesIntersect(spiderRectangle, playerRectangle)) {
           gameOn = false;
@@ -207,10 +232,11 @@ $(function() {
         context.setTransform(1,0,0,1,0,0); // reset to identity
 
         //translate the canvas origin to the center of the player
-        context.translate(400, 300);
+        context.translate(playerState.x, playerState.y);
         context.rotate(playerState.rotationAngle);
 
         context.drawImage(player, -37, -30);
+        // context.drawImage(player, player.x - 37, playerState.y);
         context.restore();
       }
 
@@ -232,7 +258,6 @@ $(function() {
       });
       context.fillStyle = "#FF0000";
       context.font = "bold 60px sans-serif";
-      console.log("score" + score);
       context.fillText(score.toString(), 8, 60);
 
       if (gameOn === false) {
@@ -245,11 +270,24 @@ $(function() {
     };
 
     function keyup(e) {
+      console.log(event.which);
       switch (event.which) {
-        case 65: // a
+        case 65: // w
+          playerState.movingLeft = false;
+          break;
+        case 87: // a
+          playerState.movingUp = false;
+          break;
+        case 68: // s
+          playerState.movingRight = false;
+          break;
+        case 83: // d
+          playerState.movingDown = false;
+          break;
+        case 81: // q
           playerState.rotatingLeft = false;
           break;
-        case 83: //s
+        case 69: // e
           playerState.rotatingRight = false;
           break;
       };
@@ -257,10 +295,22 @@ $(function() {
 
     function keydown(e) {
       switch (event.which) {
-        case 65: // a
+        case 65: // w
+          playerState.movingLeft = true;
+          break;
+        case 87: // a
+          playerState.movingUp = true;
+          break;
+        case 68: // s
+          playerState.movingRight = true;
+          break;
+        case 83: // d
+          playerState.movingDown = true;
+          break;
+        case 81: // a
           playerState.rotatingLeft = true;
           break;
-        case 83: //s
+        case 69: //s
           playerState.rotatingRight = true;
           break;
       };
@@ -268,7 +318,7 @@ $(function() {
 
     function keypress(e) {
       switch (event.which) {
-        case 108: // l
+        case 32: // spacebar
           fire();
           break;
       }
