@@ -126,7 +126,7 @@ $(function() {
         playerState.positionY -= 600;
       }
       if (playerState.positionY < 0){
-        playerState.positionY += 800;
+        playerState.positionY += 600;
       }
       if (playerState.positionX < 0){
         playerState.positionX += 800;
