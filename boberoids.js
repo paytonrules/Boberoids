@@ -79,8 +79,10 @@ $(function() {
       var facingX = Math.cos(playerState.rotationAngle);
       var facingY = Math.sin(playerState.rotationAngle);
      
-      bullets.push({x: 400, y: 300, rotationAngle: playerState.rotationAngle, facingX: facingX, facingY: facingY});
-      laserBeam.play();
+      if (bullets.length < 3) {
+        bullets.push({x: 400, y: 300, rotationAngle: playerState.rotationAngle, facingX: facingX, facingY: facingY});
+        laserBeam.play();
+      }
     };
 
     function rotatePlayer() {
@@ -92,6 +94,15 @@ $(function() {
       }
     };
 
+    function clearBullets() {
+      dead_bullets = [];
+      _(bullets).each(function(bullet) {
+        if(bullet.x > maxX() || bullet.x < 0 || bullet.y > maxY() || bullet.y < 0) {
+          _(dead_bullets).push(bullet);
+        }
+            bullets = _(bullets).difference(dead_bullets);
+      });
+    }
     function moveBullets() {
       _(bullets).each(function(bullet) {
         bullet.x += bullet.facingX * 4;
@@ -104,6 +115,7 @@ $(function() {
         rotatePlayer();
 
         moveBullets();
+        clearBullets();
         generateNewSpiders();
         moveSpiders();
         checkCollisions();
@@ -262,7 +274,7 @@ $(function() {
 
     function keypress(e) {
       switch (event.which) {
-        case 108: // l
+        case 32: // l
           fire();
           break;
       }
@@ -281,12 +293,20 @@ $(function() {
       $(document.documentElement).bind("keyup", function(e) {
         keyup(e);
       });
-      
+
       $(document.documentElement).bind("keypress", function(e) {
         keypress(e);
       });
     };
-    
+
+    function maxX() {
+      return 800;
+    }
+
+    function maxY() {
+      return 600;
+    }
+
     function getContext() {
       var canvas = $("#boberoids");
       context = canvas[0].getContext("2d");
@@ -298,7 +318,7 @@ $(function() {
         backgroundMusic.get(0).pause();
       }
     };
-   
+
     return {
       start: start,
       stop: stop
