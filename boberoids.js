@@ -21,7 +21,8 @@ $(function() {
         explosion,
         pop,
         backgroundMusic,
-        playerState = {rotatingLeft: false, rotatingRight: false, rotationAngle: 0};
+        playerState = {rotatingLeft: false, rotatingRight: false, rotationAngle: 0,
+          positionX: 400, positionY: 300, velocityX:0, velocityY:0, thrusting: false};
 
     function start() {
       lastGeneration = (new Date()).getTime();
@@ -78,9 +79,10 @@ $(function() {
     function fire() {
       var facingX = Math.cos(playerState.rotationAngle);
       var facingY = Math.sin(playerState.rotationAngle);
-     
+
       if (bullets.length < 3) {
-        bullets.push({x: 400, y: 300, rotationAngle: playerState.rotationAngle, facingX: facingX, facingY: facingY});
+        bullets.push({x: playerState.positionX, y: playerState.positionY,
+                     rotationAngle: playerState.rotationAngle, facingX: facingX, facingY: facingY});
         laserBeam.play();
       }
     };
@@ -94,6 +96,15 @@ $(function() {
       }
     };
 
+    var horsePower = 0.1;
+    function applyThrust() {
+      if (playerState.thrusting)
+        {
+          playerState.velocityX += horsePower*Math.cos(playerState.rotationAngle)
+          playerState.velocityY += horsePower*Math.sin(playerState.rotationAngle)
+        }
+    };
+
     function clearBullets() {
       dead_bullets = [];
       _(bullets).each(function(bullet) {
@@ -103,6 +114,26 @@ $(function() {
             bullets = _(bullets).difference(dead_bullets);
       });
     }
+
+    function movePlayer() {
+      playerState.positionX += playerState.velocityX;
+      playerState.positionY += playerState.velocityY;
+
+      if (playerState.positionX > 800) {
+        playerState.positionX -= 800;
+      }
+      if (playerState.positionY > 600) {
+        playerState.positionY -= 600;
+      }
+      if (playerState.positionY < 0){
+        playerState.positionY += 800;
+      }
+      if (playerState.positionX < 0){
+        playerState.positionX += 800;
+      }
+
+    };
+
     function moveBullets() {
       _(bullets).each(function(bullet) {
         bullet.x += bullet.facingX * 4;
@@ -113,6 +144,8 @@ $(function() {
     function update() {
       if (gameOn) {
         rotatePlayer();
+        applyThrust();
+        movePlayer();
 
         moveBullets();
         clearBullets();
@@ -129,7 +162,7 @@ $(function() {
       if ((currentTime - lastGeneration) > SPAWN_RATE) {
         generateSpider();
         lastGeneration = currentTime;
-      } 
+      }
     };
 
     function generateSpider() {
@@ -183,7 +216,8 @@ $(function() {
     function checkCollisionsWithSpidersAndPlayer() {
       _(spiders).each(function(spider) {
         var spiderRectangle = {left: spider.x, top: spider.y, right: spider.x + 96, bottom: spider.y + 88};
-        var playerRectangle = {left: 415, top: 315, right: 450, bottom: 340};
+        var playerRectangle = {left: playerState.positionX + 15, top: playerState.positionY + 15,
+          right: playerState.positionX + 50, bottom: playerState.positionY + 40};
 
         if (rectanglesIntersect(spiderRectangle, playerRectangle)) {
           gameOn = false;
@@ -217,7 +251,7 @@ $(function() {
         context.setTransform(1,0,0,1,0,0); // reset to identity
 
         //translate the canvas origin to the center of the player
-        context.translate(400, 300);
+        context.translate(playerState.positionX, playerState.positionY);
         context.rotate(playerState.rotationAngle);
 
         context.drawImage(player, -37, -30);
@@ -244,7 +278,7 @@ $(function() {
       if (gameOn === false) {
         context.fillStyle = "#FF0000";
         context.font = "bold 60px sans-serif";
-        context.fillText("Game Over", 200, 200); 
+        context.fillText("Game Over", 200, 200);
         context.font = "bold 24px sans-serif";
         context.fillText("Can't kill bugs eh?  I guess you'd rather work for Obtiva.", 100, 270);
       }
@@ -258,6 +292,9 @@ $(function() {
         case 83: //s
           playerState.rotatingRight = false;
           break;
+        case 66: //b
+          playerState.thrusting = false;
+          break;
       };
     };
 
@@ -268,6 +305,9 @@ $(function() {
           break;
         case 83: //s
           playerState.rotatingRight = true;
+          break;
+        case 66: //b
+          playerState.thrusting = true;
           break;
       };
     };
