@@ -11,7 +11,7 @@ $(function() {
         spaceBackground,
         player,
         bulletImage,
-        spiderImage,
+        spiderImages = [],
         bullets = [],
         spiders = [],
         score = 0,
@@ -58,9 +58,14 @@ $(function() {
         bulletImage = bulletJQueryImage.get(0);
       });
 
-      var spiderJQueryImage = $("<img src='images/bug_sprite.png'>");
-      spiderJQueryImage.load(function() {
-        spiderImage = spiderJQueryImage.get(0);
+      var hashrocketLogo = $("<img src='images/hashrocket_logo.png'>");
+      hashrocketLogo.load(function() {
+        spiderImages.push(hashrocketLogo.get(0));
+      });
+      
+      var obtivaLogo = $("<img src='images/obtiva_logo.png'>");
+      obtivaLogo.load(function() {
+        spiderImages.push(obtivaLogo.get(0));
       });
 
       backgroundMusic = $("<audio src='sounds/agelessspaceship.mp3' loop='loop'>");
@@ -147,8 +152,9 @@ $(function() {
       var directionVector = {x: 400 - x, y: 300 - y };
       var directionLength = Math.sqrt(directionVector.x * directionVector.x + directionVector.y * directionVector.y);
       var normalizedDirectionVector = {x: directionVector.x / directionLength, y: directionVector.y / directionLength};
+      var image = spiderImages[Math.floor(Math.random()*spiderImages.length)]
   
-      spiders.push({x: x, y: y, directionVector: normalizedDirectionVector});
+      spiders.push({x: x, y: y, directionVector: normalizedDirectionVector, image: image});
     };
 
     function moveSpiders() {
@@ -181,7 +187,7 @@ $(function() {
 
     function checkCollisionsWithSpidersAndBullets() {
       _(spiders).each(function(spider) {
-        var spiderRectangle = {left: spider.x, top: spider.y, right: spider.x + 96, bottom: spider.y + 88};
+        var spiderRectangle = {left: spider.x, top: spider.y, right: spider.x + 90, bottom: spider.y + 90};
         _(bullets).each(function(bullet) {
           var bulletRectangle = {left: bullet.x, top: bullet.y, right: bullet.x + 23, bottom: bullet.y + 7};
           if (rectanglesIntersect(spiderRectangle, bulletRectangle)) {
@@ -197,7 +203,7 @@ $(function() {
 
     function checkCollisionsWithSpidersAndPlayer() {
       _(spiders).each(function(spider) {
-        var spiderRectangle = {left: spider.x, top: spider.y, right: spider.x + 96, bottom: spider.y + 88};
+        var spiderRectangle = {left: spider.x, top: spider.y, right: spider.x + 90, bottom: spider.y + 90};
         var playerRectangle = {left: playerState.x, top: playerState.y, right: playerState.x + 35, bottom: playerState.y + 35};
 
         if (rectanglesIntersect(spiderRectangle, playerRectangle)) {
@@ -253,7 +259,7 @@ $(function() {
         context.save();
         context.setTransform(1,0,0,1,0,0);
         context.translate(spider.x, spider.y);
-        context.drawImage(spiderImage, -48, -44);
+        context.drawImage(spider.image, -48, -44);
         context.restore();
       });
       context.fillStyle = "#FF0000";
@@ -284,10 +290,10 @@ $(function() {
         case 83: // d
           playerState.movingDown = false;
           break;
-        case 81: // q
+        case 37: // left
           playerState.rotatingLeft = false;
           break;
-        case 69: // e
+        case 39: // right
           playerState.rotatingRight = false;
           break;
       };
@@ -307,10 +313,11 @@ $(function() {
         case 83: // d
           playerState.movingDown = true;
           break;
-        case 81: // a
+        // case 81: // a
+        case 37: // left
           playerState.rotatingLeft = true;
           break;
-        case 69: //s
+        case 39: // right
           playerState.rotatingRight = true;
           break;
       };
