@@ -10,7 +10,7 @@ $(function() {
     var context,
         spaceBackground,
         player,
-        bulletImage,
+        bulletImages = [],
         spiderImage,
         bullets = [],
         spiders = [],
@@ -21,7 +21,7 @@ $(function() {
         explosion,
         pop,
         backgroundMusic,
-        playerState = {rotatingLeft: false, rotatingRight: false, rotationAngle: 0};
+        playerState = {rotatingLeft: false, rotatingRight: false, rotationAngle: 0, score: 0};
 
     function start() {
       lastGeneration = (new Date()).getTime();
@@ -44,9 +44,21 @@ $(function() {
         player = playerImage.get(0);
       });
 
-      var bulletJQueryImage = $("<img src='images/bullet.png'>");
-      bulletJQueryImage.load(function() {
-        bulletImage = bulletJQueryImage.get(0);
+      var bulletBlueJQueryImage = $("<img src='images/bullet-blue.png'>");
+      var bulletGreenJQueryImage = $("<img src='images/bullet-green.png'>");
+      var bulletIndigoJQueryImage = $("<img src='images/bullet-indigo.png'>");
+      var bulletPurpleJQueryImage = $("<img src='images/bullet-purple.png'>");
+      bulletBlueJQueryImage.load(function() {
+        bulletImages.push(bulletBlueJQueryImage.get(0));
+      });
+      bulletGreenJQueryImage.load(function() {
+        bulletImages.push(bulletGreenJQueryImage.get(0));
+      });
+      bulletIndigoJQueryImage.load(function() {
+        bulletImages.push(bulletIndigoJQueryImage.get(0));
+      });
+      bulletPurpleJQueryImage.load(function() {
+        bulletImages.push(bulletPurpleJQueryImage.get(0));
       });
 
       var spiderJQueryImage = $("<img src='images/bug_sprite.png'>");
@@ -78,7 +90,7 @@ $(function() {
     function fire() {
       var facingX = Math.cos(playerState.rotationAngle);
       var facingY = Math.sin(playerState.rotationAngle);
-     
+
       bullets.push({x: 400, y: 300, rotationAngle: playerState.rotationAngle, facingX: facingX, facingY: facingY});
       laserBeam.play();
     };
@@ -96,6 +108,7 @@ $(function() {
       _(bullets).each(function(bullet) {
         bullet.x += bullet.facingX * 4;
         bullet.y += bullet.facingY * 4;
+        bullet.rotationAngle = bullet.rotationAngle + Math.PI/90;
       });
     };
 
@@ -117,7 +130,7 @@ $(function() {
       if ((currentTime - lastGeneration) > SPAWN_RATE) {
         generateSpider();
         lastGeneration = currentTime;
-      } 
+      }
     };
 
     function generateSpider() {
@@ -137,7 +150,7 @@ $(function() {
       var directionVector = {x: 400 - x, y: 300 - y };
       var directionLength = Math.sqrt(directionVector.x * directionVector.x + directionVector.y * directionVector.y);
       var normalizedDirectionVector = {x: directionVector.x / directionLength, y: directionVector.y / directionLength};
-  
+
       spiders.push({x: x, y: y, directionVector: normalizedDirectionVector});
     };
 
@@ -161,12 +174,17 @@ $(function() {
           if (rectanglesIntersect(spiderRectangle, bulletRectangle)) {
             spiders = _(spiders).difference([spider]);
             bullets = _(bullets).difference([bullet]);
+            updateScore();
             pop.play();
             return;
           }
         });
       });
     };
+
+    function updateScore() {
+      playerState.score = playerState.score + 5;
+    }
 
     function checkCollisionsWithSpidersAndPlayer() {
       _(spiders).each(function(spider) {
@@ -180,7 +198,6 @@ $(function() {
         }
       });
     };
-
 
     function rectanglesIntersect(rectangleOne, rectangleTwo) {
       return !(rectangleTwo.left > rectangleOne.right
@@ -198,6 +215,10 @@ $(function() {
       clearBackground();
       if (spaceBackground) {
         context.drawImage(spaceBackground, 0, 0);
+        context.fillStyle = "#FF8";
+        context.font = "bold 60px sans-serif";
+        context.textAlign = "right";
+        context.fillText(playerState.score, 760, 80);
       }
 
       if (player) {
@@ -217,7 +238,7 @@ $(function() {
         context.setTransform(1,0,0,1,0,0);
         context.translate(bullet.x, bullet.y);
         context.rotate(bullet.rotationAngle);
-        context.drawImage(bulletImage, -23, -7);
+        context.drawImage(bulletImages[bullets.length % 4], -23, -7);
         context.restore();
       });
 
@@ -232,9 +253,9 @@ $(function() {
       if (gameOn === false) {
         context.fillStyle = "#FF0000";
         context.font = "bold 60px sans-serif";
-        context.fillText("Game Over", 200, 200); 
+        context.fillText("Game Over", 550, 200);
         context.font = "bold 24px sans-serif";
-        context.fillText("Can't kill bugs eh?  I guess you'd rather work for Obtiva.", 100, 270);
+        context.fillText("Can't kill bugs eh?  I guess you'd rather work for Obtiva.", 750, 270);
       }
     };
 
@@ -281,12 +302,12 @@ $(function() {
       $(document.documentElement).bind("keyup", function(e) {
         keyup(e);
       });
-      
+
       $(document.documentElement).bind("keypress", function(e) {
         keypress(e);
       });
     };
-    
+
     function getContext() {
       var canvas = $("#boberoids");
       context = canvas[0].getContext("2d");
@@ -298,7 +319,7 @@ $(function() {
         backgroundMusic.get(0).pause();
       }
     };
-   
+
     return {
       start: start,
       stop: stop
