@@ -234,7 +234,7 @@ $(function() {
         context.font = "bold 60px sans-serif";
         context.fillText("Game Over", 200, 200); 
         context.font = "bold 24px sans-serif";
-        context.fillText("Can't kill bugs eh?  I guess you'd rather work for Obtiva.", 100, 270);
+        context.fillText("Can't kill bugs eh?  You'll never make it as a developer.", 100, 270);
       }
     };
 
